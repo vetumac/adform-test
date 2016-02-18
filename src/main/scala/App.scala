@@ -20,7 +20,7 @@ object App {
         case false => "Range not exist"
       }) + "\n")
     })
-    transactionsBuffer.clone()
+    transactionsBuffer.close()
     out.flush()
   }
 }
