@@ -1,12 +1,12 @@
 
 class Range(val min: Int, val max: Int, val name: String) {
 
-  def this(range: String) = {
+  def this(range: String) {
+    this(min, max, name)
     val words = range.split("[-\t]")
     val min = getNumericAddress(words(0))
     val max = getNumericAddress(words(1))
     val name = words(2)
-    this ()
   }
 
   private def getNumericAddress(address: String): Int = {
