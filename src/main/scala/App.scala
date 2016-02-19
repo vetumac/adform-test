@@ -19,10 +19,15 @@ object App {
   def getRanges(file: String) = {
     val rangesBuffer = Source.fromFile(file)
     val ranges = rangesBuffer.getLines().foldLeft(List[Range]())((op: List[Range], current: String) => {
-      val newRange = new Range(current)
-      op.foldLeft(List[Range]())((f: List[Range], current: Range) => {
-
-      })
+      //val newRange = Range(current)
+      val lst = op.foldLeft((List[Range](), Range(current)))((f: (List[Range], Range), current: Range) => {
+        val confluenceRange = Range.confluenceRanges(current, f._2)
+        confluenceRange match {
+          case null => (current :: f._1, f._2)
+          case _ => (f._1, confluenceRange);
+        }
+      }
+        lst._2 :: lst._1)
     })
     rangesBuffer.close()
     ranges
@@ -31,7 +36,7 @@ object App {
   def transactionsMapping(source: Source, destination: OutputStreamWriter, ranges: List[Range]) = {
     source.getLines().foreach(str => {
       val words = str.split("\t")
-      val range = ranges.find(p => p.isInRange(words(1)))
+      val range = ranges.find(p => p.isInRange(Range.getNumericAddress(words(1))))
       destination.write(words(0) + "\t" + (range.exists(p => p != null) match {
         case true => range.get.name
         case false => "Range not exist"
