@@ -1,26 +1,41 @@
-import java.io.FileWriter
+import java.io.{FileWriter, OutputStreamWriter}
 
 import scala.io.Source
 
 object App {
 
   def main(args: Array[String]) = {
-    val rangesBuffer = Source.fromFile("ranges.tsv")
+    val ranges = getRanges("ranges.tsv")
+
+    val output = new FileWriter("output.tsv")
+    val input = Source.fromFile("transactions.tsv")
+
+    transactionsMapping(input, output, ranges)
+
+    input.close()
+    output.flush()
+  }
+
+  def getRanges(file: String) = {
+    val rangesBuffer = Source.fromFile(file)
     val ranges = rangesBuffer.getLines().foldLeft(List[Range]())((op: List[Range], current: String) => {
-      new Range(current) :: op
+      val newRange = new Range(current)
+      op.foldLeft(List[Range]())((f: List[Range], current: Range) => {
+
+      })
     })
     rangesBuffer.close()
-    val out = new FileWriter("output.tsv")
-    val transactionsBuffer = Source.fromFile("transactions.tsv")
-    transactionsBuffer.getLines().foreach(str => {
+    ranges
+  }
+
+  def transactionsMapping(source: Source, destination: OutputStreamWriter, ranges: List[Range]) = {
+    source.getLines().foreach(str => {
       val words = str.split("\t")
       val range = ranges.find(p => p.isInRange(words(1)))
-      out.write(words(0) + "\t" + (range.exists(p => p != null) match {
+      destination.write(words(0) + "\t" + (range.exists(p => p != null) match {
         case true => range.get.name
         case false => "Range not exist"
       }) + "\n")
     })
-    transactionsBuffer.close()
-    out.flush()
   }
 }
