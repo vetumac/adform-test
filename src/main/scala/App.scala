@@ -18,15 +18,7 @@ object App {
 
   def getRanges(file: String) = {
     val rangesBuffer = Source.fromFile(file)
-    val ranges = rangesBuffer.getLines().foldLeft(List[Range]())((op: List[Range], current: String) => {
-      op.foldLeft((List[Range](), Range(current)))((f: (List[Range], Range), current: Range) => {
-        val confluenceRange = Range.confluenceRanges(current, f._2)
-        confluenceRange match {
-          case null => (current :: f._1, f._2)
-          case _ => (f._1, confluenceRange);
-        }
-      })._1
-    })
+    val ranges = rangesBuffer.getLines().foldLeft(List[Range]())((op: List[Range], current: String) => mergeRangeWithRanges(op, current))
     rangesBuffer.close()
     ranges
   }
@@ -42,7 +34,15 @@ object App {
     })
   }
 
-  def mergeRangeWithRanges(ranges: List[Range], range: Range) = {
-
+  def mergeRangeWithRanges(ranges: List[Range], range: String) = {
+    val merged = ranges.foldLeft(List[Range](), Range(range))((f: (List[Range], Range), current: Range) => {
+      val confluenceRange = Range.confluenceRanges(current, f._2)
+      confluenceRange match {
+        case null => (current :: f._1, f._2)
+        case _ => (f._1, confluenceRange);
+      }
+    })
+    merged._2 :: merged._1
   }
+
 }
