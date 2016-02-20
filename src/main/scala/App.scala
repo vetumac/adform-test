@@ -23,17 +23,6 @@ object App {
     ranges
   }
 
-  def transactionsMapping(source: Source, destination: OutputStreamWriter, ranges: List[Range]) = {
-    source.getLines().foreach(str => {
-      val words = str.split("\t")
-      val range = ranges.find(p => p.isInRange(Range.getNumericAddress(words(1))))
-      destination.write(words(0) + "\t" + (range.exists(p => p != null) match {
-        case true => range.get.name
-        case false => "Range not exist"
-      }) + "\n")
-    })
-  }
-
   def mergeRangeWithRanges(ranges: List[Range], range: String) = {
     val merged = ranges.foldLeft(List[Range](), Range(range))((f: (List[Range], Range), current: Range) => {
       val confluenceRange = Range.confluenceRanges(current, f._2)
@@ -43,6 +32,17 @@ object App {
       }
     })
     merged._2 :: merged._1
+  }
+
+  def transactionsMapping(source: Source, destination: OutputStreamWriter, ranges: List[Range]) = {
+    source.getLines().foreach(str => {
+      val words = str.split("\t")
+      val range = ranges.find(p => p.isInRange(Range.getNumericAddress(words(1))))
+      destination.write(words(0) + "\t" + (range.exists(p => p != null) match {
+        case true => range.get.name
+        case false => "Range not exist"
+      }) + "\n")
+    })
   }
 
 }
