@@ -24,16 +24,21 @@ object Range {
   }
 
   def confluenceRanges(a: Range, b: Range): Range = {
-    val lst = a.min > b.min match {
-      case true => List(b, a)
-      case false => List(a, b)
-    }
-    lst(0).max < lst(0).min match {
-      case true => null
-      case false => lst(0).max < lst(1).max match {
-        case true => new Range(lst(0).min, lst(1).max, lst(0).name)
-        case false => lst(0)
+    a.name == b.name match {
+      case true => {
+        val lst = a.min > b.min match {
+          case true => List(b, a)
+          case false => List(a, b)
+        }
+        lst(0).max < lst(0).min match {
+          case true => null
+          case false => lst(0).max < lst(1).max match {
+            case true => new Range(lst(0).min, lst(1).max, lst(0).name)
+            case false => lst(0)
+          }
+        }
       }
+      case false => null
     }
   }
 }

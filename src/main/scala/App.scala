@@ -41,4 +41,8 @@ object App {
       }) + "\n")
     })
   }
+
+  def mergeRangeWithRanges(ranges: List[Range], range: Range) = {
+
+  }
 }
