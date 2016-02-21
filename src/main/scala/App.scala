@@ -14,7 +14,7 @@ object App {
     transactionsMapping(input, output, ranges)
 
     input.close()
-    output.flush(x)
+    output.flush()
   }
 
   def getRanges(file: String) = {
