@@ -1,5 +1,6 @@
 import java.io.{FileWriter, OutputStreamWriter}
 
+import scala.collection.SortedMap
 import scala.io.Source
 
 object App {
@@ -35,6 +36,11 @@ object App {
   }
 
   def transactionsMapping(source: Source, destination: OutputStreamWriter, ranges: List[Range]) = {
+
+    val minSortedRanges = ranges.foldLeft(SortedMap[Long, Range]())((op: SortedMap[Long, Range], currentRange: Range) =>
+      op + (currentRange.min -> currentRange)
+    )
+
     source.getLines().foreach(str => {
       val words = str.split("\t")
       val range = ranges.find(p => p.isInRange(Range.getNumericAddress(words(1))))
